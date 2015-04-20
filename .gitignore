@@ -1,0 +1,4 @@
+.envrc
+*.tar.gz
+*.tar.gz.*
+lattice

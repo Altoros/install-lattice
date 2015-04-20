@@ -1,0 +1,47 @@
+#!/usr/bin/env sh
+ 
+# This scripts installs lattice to AWS in "one click".
+ 
+# I used this script with terraform-0.4.2
+# I expect following environment variables to be definded
+#   - AWS_ACCESS_KEY
+#   - AWS_SECRET_KEY
+#   - AWS_KEY_NAME
+#   - AWS_KEY_PATH
+ 
+LATTICE_VERSION=${LATTICE_VERSION:-0.2.3}
+ 
+wget https://github.com/cloudfoundry-incubator/lattice/archive/v$LATTICE_VERSION.tar.gz
+tar -xvf v$LATTICE_VERSION.tar.gz
+mv lattice-$LATTICE_VERSION lattice
+cd lattice/terraform/aws/example
+ 
+ 
+if [[ "$OSTYPE" == "linux-gnu" ]]; then
+  # Ubuntu 
+  sed -i 's/aws_access_key = "<CHANGE-ME>"/aws_access_key = "'$AWS_ACCESS_KEY'"/g' lattice.aws.tf
+  sed -i 's/aws_secret_key = "<CHANGE-ME>"/aws_secret_key = "'$AWS_SECRET_KEY'"/g' lattice.aws.tf
+  sed -i 's/aws_key_name = "<CHANGE-ME>"/aws_key_name = "'$AWS_KEY_NAME'"/g' lattice.aws.tf
+  sed -i 's|aws_ssh_private_key_file = "<CHANGE-ME>"|aws_ssh_private_key_file = "'$AWS_KEY_PATH'"|g' lattice.aws.tf  
+  if [ ! -z "$AWS_REGION" ]; then
+    sed -i 's/# aws_region = "<CHANGE-ME>"/aws_region = "'$AWS_REGION'"/g' lattice.aws.tf
+  fi  
+elif [[ "$OSTYPE" == "darwin"* ]]; then
+  # Mac OS X
+  sed -i '' 's/aws_access_key = "<CHANGE-ME>"/aws_access_key = "'$AWS_ACCESS_KEY'"/g' lattice.aws.tf
+  sed -i '' 's/aws_secret_key = "<CHANGE-ME>"/aws_secret_key = "'$AWS_SECRET_KEY'"/g' lattice.aws.tf
+  sed -i '' 's/aws_key_name = "<CHANGE-ME>"/aws_key_name = "'$AWS_KEY_NAME'"/g' lattice.aws.tf
+  sed -i '' 's|aws_ssh_private_key_file = "<CHANGE-ME>"|aws_ssh_private_key_file = "'${AWS_KEY_PATH}'"|g' lattice.aws.tf  
+  if [ ! -z "$AWS_REGION" ]; then
+    sed -i '' 's/# aws_region = "<CHANGE-ME>"/aws_region = "'$AWS_REGION'"/g' lattice.aws.tf
+  fi  
+fi
+ 
+terraform get -update
+terraform apply
+ 
+# Install CLI 
+echo "Now you can use lattice."
+echo "Install Lattice CLI with following commands:"
+echo "    sudo wget https://lattice.s3.amazonaws.com/releases/latest/darwin-amd64/ltc -O /usr/bin/ltc"
+echo "    sudo chmod +x /usr/bin/ltc"
