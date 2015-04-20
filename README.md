@@ -20,10 +20,10 @@ Pay attention to the following:
 
 After you prepared everything you can run installer:
 ```bash
-. .envrc    # load environment variables if you don't have direnv
-./install-lattice
+. .envrc            # load environment variables if you don't have direnv
+./install-lattice   # run installation process
 ```
 
 ### Afterwords
 
-Feel free to contribute or ask questions using issues
+Feel free to contribute or ask questions using issues.
